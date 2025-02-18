@@ -169,7 +169,7 @@ Resources:
           #!/bin/bash
           private_ip=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
           public_ip=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
-          /bin/bash /opt/script/config.sh ${private_ip} ${public_ip} ${PamSecurityGroup}
+          /bin/bash /opt/script/config.sh $private_ip $public_ip ${PamSecurityGroup}
           sleep 1m
           echo "***end of ansible playbook deployment for PAM***"
           /opt/aws/bin/cfn-signal -e $? '${PamWaitHandle}' 
