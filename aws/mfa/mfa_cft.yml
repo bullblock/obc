@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Paraview IAM Standalone Trial edition for AWS Cloudformation Template ver 1.0
+Description: Paraview MFA Standalone FREE edition for AWS Cloudformation Template ver 1.0
 
 Mappings:
   RegionMap:
@@ -167,7 +167,7 @@ Resources:
       UserData: 
         Fn::Base64: !Sub |
           #!/bin/bash
-          /bin/bash /opt/script/iam_config.sh ${SecurityGroup}
+          /opt/script/mfa_config.sh ${SecurityGroup}
           sleep 3m
           echo "***end of ansible playbook deployment***"
           /opt/aws/bin/cfn-signal -e $? '${WaitHandle}' 
