@@ -14,7 +14,7 @@ random_pwd=$1
 script_dir=$(cd "$(dirname "$0")"; pwd)
 cd $script_dir
 
-pravite_ip=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+private_ip=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 public_ip=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
 ssh_user=devops
 ssh_pass="Admin!23Admin"
@@ -28,7 +28,7 @@ sudo systemctl restart sshd
 sudo cp -f inventory.standalone.sudo inventory
 
 # modify host and home_url
-sudo sed -i "s/1.1.1.1/${pravite_ip}/g" inventory
+sudo sed -i "s/1.1.1.1/${private_ip}/g" inventory
 sudo sed -i "s/homeurl=esc.paraview.cn/homeurl=${public_ip}/g" inventory
 sudo sed -i "s/gateway_mgmt_url=gateway.paraview.cn/gateway_mgmt_url=${public_ip}/g" inventory
 
