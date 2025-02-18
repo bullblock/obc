@@ -168,7 +168,7 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           /bin/bash /opt/script/iam_config.sh ${SecurityGroup}
-          sleep 1m
+          sleep 3m
           echo "***end of ansible playbook deployment***"
           /opt/aws/bin/cfn-signal -e $? '${WaitHandle}' 
       Tags:
