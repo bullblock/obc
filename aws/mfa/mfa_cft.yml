@@ -60,7 +60,7 @@ Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: para-iam-IAMRole-trial
+      RoleName: para-pam-IAMRole-free
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -69,7 +69,7 @@ Resources:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: para-iam-IAMPolicy-trial
+        - PolicyName: para-pam-IAMPolicy-free
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -79,12 +79,12 @@ Resources:
                 Resource: '*'
       Tags:
         - Key: Name
-          Value: para-iam-IAMRole-trial
+          Value: para-pam-IAMRole-free
 
   GetVpcCidrFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: para-iam-LambdaFunction-trial
+      FunctionName: para-pam-LambdaFunction-free
       Handler: index.handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.12
@@ -105,7 +105,7 @@ Resources:
       Timeout: 60
       Tags:
         - Key: Name
-          Value: para-iam-LambdaFunction-trial
+          Value: para-pam-LambdaFunction-free
 
   VpcCidrCustomResource:
     Type: Custom::GetVpcCidr
@@ -116,7 +116,7 @@ Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: para-iam-SecurityGroup-trial
+      GroupName: para-pam-SecurityGroup-free
       GroupDescription: Security group with specific ingress rules
       VpcId: !Ref VpcId
       SecurityGroupIngress:
@@ -145,7 +145,7 @@ Resources:
           CidrIp: !GetAtt VpcCidrCustomResource.VpcCidr
       Tags:
         - Key: Name
-          Value: para-iam-SecurityGroup-trial
+          Value: para-pam-SecurityGroup-free
 
   ElasticIP:
     Type: AWS::EC2::EIP
@@ -153,7 +153,7 @@ Resources:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: para-iam-EIP-trial
+          Value: para-pam-EIP-free
 
   EC2Instance:
     Type: AWS::EC2::Instance
@@ -173,7 +173,7 @@ Resources:
           /opt/aws/bin/cfn-signal -e $? '${WaitHandle}' 
       Tags:
         - Key: Name
-          Value: para-iam-EC2Instance-trial
+          Value: para-pam-EC2Instance-free
 
   EIPAssociation:
     Type: AWS::EC2::EIPAssociation
