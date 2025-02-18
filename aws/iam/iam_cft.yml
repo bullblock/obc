@@ -4,17 +4,17 @@ Description: Paraview IAM Standalone Trial edition for AWS Cloudformation Templa
 Mappings:
   RegionMap:
     us-east-1:
-      ami: ami-059f025d1153e50cd
+      ami: ami-0641893be58217e66
     us-east-2:
-      ami: ami-0218bd88b58dfad28
+      ami: ami-0b0499460c6c1d41e
     us-west-1:
-      ami: ami-0e9975b7949be6501
+      ami: ami-08af4028ce7378cc7
     us-west-2:
-      ami: ami-0a410ccf92c3e8627
+      ami: ami-0d4cd0609484556d7
     ap-southeast-1:
-      ami: ami-03bbe8d570b61bcd4
+      ami: ami-0f888f6f98ea74f4f
     ap-east-1:
-      ami: ami-0c845b72bdb5c19b7
+      ami: ami-06264d37e658dd958
 
 Parameters:
   VpcId:
@@ -167,11 +167,7 @@ Resources:
       UserData: !Base64
         Fn::Sub: |
           #!/bin/bash
-          cd /home/devops/latest
-          ./auto_deploy.sh
-          cd /root/
-          rm -rf /home/devops
-          sudo userdel -rf devops
+          /bin/bash /opt/script/iam_config.sh ${EC2Instance.InstanceId}
           sleep 1m
           echo "***end of ansible playbook deployment***"
           /opt/aws/bin/cfn-signal -e $? '${WaitHandle}' 
