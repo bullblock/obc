@@ -60,7 +60,7 @@ Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: para-pam-IAMRole-free
+      RoleName: !Join ['-', ['para-pam-IAMRole-free', !Ref 'AWS::Region']]
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -69,7 +69,7 @@ Resources:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: para-pam-IAMPolicy-free
+        - PolicyName: !Join ['-', ['para-pam-IAMPolicy-free', !Ref 'AWS::Region']]
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -79,12 +79,12 @@ Resources:
                 Resource: '*'
       Tags:
         - Key: Name
-          Value: para-pam-IAMRole-free
+          Value: !Join ['-', ['para-pam-IAMRole-free', !Ref 'AWS::Region']]
 
   GetVpcCidrFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: para-pam-LambdaFunction-free
+      FunctionName: !Join ['-', ['para-pam-LambdaFunction-free', !Ref 'AWS::Region']]
       Handler: index.handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.12
@@ -105,7 +105,7 @@ Resources:
       Timeout: 60
       Tags:
         - Key: Name
-          Value: para-pam-LambdaFunction-free
+          Value: !Join ['-', ['para-pam-LambdaFunction-free', !Ref 'AWS::Region']]
 
   VpcCidrCustomResource:
     Type: Custom::GetVpcCidr
@@ -116,7 +116,7 @@ Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: para-pam-SecurityGroup-free
+      GroupName: !Join ['-', ['para-pam-SecurityGroup-free', !Ref 'AWS::Region']]
       GroupDescription: Security group with specific ingress rules
       VpcId: !Ref VpcId
       SecurityGroupIngress:
@@ -145,7 +145,7 @@ Resources:
           CidrIp: !GetAtt VpcCidrCustomResource.VpcCidr
       Tags:
         - Key: Name
-          Value: para-pam-SecurityGroup-free
+          Value: !Join ['-', ['para-pam-SecurityGroup-free', !Ref 'AWS::Region']]
 
   ElasticIP:
     Type: AWS::EC2::EIP
@@ -153,7 +153,7 @@ Resources:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: para-pam-EIP-free
+          Value: !Join ['-', ['para-pam-EIP-free', !Ref 'AWS::Region']]
 
   EC2Instance:
     Type: AWS::EC2::Instance
@@ -173,7 +173,7 @@ Resources:
           /opt/aws/bin/cfn-signal -e $? '${WaitHandle}' 
       Tags:
         - Key: Name
-          Value: para-pam-EC2Instance-free
+          Value: Join ['-', ['para-pam-EC2Instance-free', !Ref 'AWS::Region']]
 
   EIPAssociation:
     Type: AWS::EC2::EIPAssociation
@@ -193,4 +193,4 @@ Outputs:
   DeploymentMessage:
     Description: The final output of the deployment
     Value: !Sub |
-      Access portal: http://${ElasticIP} with credentail: sysadmin/${SecurityGroup} You will have 7 days license for your evaluation and testing. Thanks!
+      Welcome to the Paraview MFA access portal: http://${ElasticIP} with credentail: sysadmin/${SecurityGroup} You will have 7 days license for your evaluation and testing. Thanks!
