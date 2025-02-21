@@ -46,6 +46,12 @@ Parameters:
     AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
     ConstraintDescription: 'Must be a valid CIDR block in the format x.x.x.x/n'
 
+  DefaultCidr:
+    Desciption: 'Please enter the 0.0.0.0/0 by default. Else you will not allow to access the portal.'
+    Type: String
+    Default: '0.0.0.0/0'
+    ConstraintDescription: 'Please enter the 0.0.0.0/0 by default. Else you will not allow to access the portal.'
+
 Resources:
   WaitHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
@@ -130,19 +136,27 @@ Resources:
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref DefaultCidr
 
         # Allow HTTP (port 80) from anywhere
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref DefaultCidr
 
         # Allow all traffic within the VPC CIDR range
         - IpProtocol: -1
           FromPort: -1
           ToPort: -1
           CidrIp: !GetAtt VpcCidrCustomResource.VpcCidr
+      
+      SecurityGroupEgress:
+        # Allow all outbound traffic
+        - IpProtocol: '-1'
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref DefaultCidr
+
       Tags:
         - Key: Name
           Value: !Join ['-', ['para-pam-SecurityGroup-free', !Ref 'AWS::Region']]
