@@ -4,17 +4,17 @@ Description: Paraview MFA Standalone FREE edition for AWS Cloudformation Templat
 Mappings:
   RegionMap:
     us-east-1:
-      ami: ami-0d0ee3c4542c84e7e
+      ami: ami-0f979511befd35252
     us-east-2:
-      ami: ami-0b6f54cfb812e5751
+      ami: ami-09c68fb2e6a9f5824
     us-west-1:
-      ami: ami-0673d1cd46bbfcd73
+      ami: ami-07021a9213a0a5567
     us-west-2:
-      ami: ami-05ffa7cf3050c9530
+      ami: ami-09541969338e4c074
     ap-southeast-1:
-      ami: ami-0b606431ea780a2f1
+      ami: ami-07e497cbc2f94a11f
     ap-east-1:
-      ami: ami-09c7d309a13aa3d5a
+      ami: ami-037bd7b631b99e986
 
 Parameters:
   VpcId:
