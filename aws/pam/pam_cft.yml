@@ -4,7 +4,7 @@ Description: Paraview PAM Standalone FREE edition for AWS Cloudformation Templat
 Mappings:
   RegionMap:
     us-east-1:
-      ami: ami-01c31ddbf79d6accc
+      ami: ami-043f85f6f71780863
     us-east-2:
       ami: ami-002a15b3f4771ef44
     us-west-1:
