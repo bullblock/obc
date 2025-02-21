@@ -4,7 +4,7 @@ Description: Paraview PAM Standalone FREE edition for AWS Cloudformation Templat
 Mappings:
   RegionMap:
     us-east-1:
-      ami: ami-054cfdd98594373cb
+      ami: ami-06f5003bcef1afcad
     us-east-2:
       ami: ami-002a15b3f4771ef44
     us-west-1:
@@ -27,7 +27,7 @@ Parameters:
 
   PamInstanceType:
     Type: String
-    Default: t2.xlarge
+    Default: m5.xlarge
     Description: Select the EC2 instance type for PAM instance
     AllowedValues:
       - t2.xlarge
@@ -46,6 +46,12 @@ Parameters:
     AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
     ConstraintDescription: 'Must be a valid CIDR block in the format x.x.x.x/n'
 
+  DefaultCidr:
+    Description: 'Please enter the 0.0.0.0/0 by default. Else you will not allow to access the portal.'
+    Type: String
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+    ConstraintDescription: 'Please enter the 0.0.0.0/0 by default. Else you will not allow to access the portal.'
+
 Resources:
   PamWaitHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
@@ -60,7 +66,7 @@ Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: para-pam-IAMRole-trial
+      RoleName: !Join ['-', ['para-pam-IAMRole-free', !Ref 'AWS::Region']]
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -69,7 +75,7 @@ Resources:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: para-pam-IAMPolicy-trial
+        - PolicyName: !Join ['-', ['para-pam-IAMPolicy-free', !Ref 'AWS::Region']]
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -79,12 +85,12 @@ Resources:
                 Resource: '*'
       Tags:
         - Key: Name
-          Value: para-pam-IAMRole-trial
+          Value: !Join ['-', ['para-pam-IAMRole-free', !Ref 'AWS::Region']]
 
   GetVpcCidrFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: para-pam-LambdaFunction-trial
+      FunctionName: !Join ['-', ['para-pam-LambdaFunction-free', !Ref 'AWS::Region']]
       Handler: index.handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.12
@@ -105,7 +111,7 @@ Resources:
       Timeout: 60
       Tags:
         - Key: Name
-          Value: para-pam-LambdaFunction-trial
+          Value: !Join ['-', ['para-pam-LambdaFunction-free', !Ref 'AWS::Region']]
 
   VpcCidrCustomResource:
     Type: Custom::GetVpcCidr
@@ -116,7 +122,7 @@ Resources:
   PamSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: para-pam-SecurityGroup-trial
+      GroupName: !Join ['-', ['para-pam-SecurityGroup-free', !Ref 'AWS::Region']]
       GroupDescription: Pam EC2 Security group with specific ingress rules
       VpcId: !Ref VpcId
       SecurityGroupIngress:
@@ -130,22 +136,30 @@ Resources:
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref DefaultCidr
 
         # Allow HTTP (port 80) from anywhere
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref DefaultCidr
 
         # Allow all traffic within the VPC CIDR range
         - IpProtocol: -1
           FromPort: -1
           ToPort: -1
           CidrIp: !GetAtt VpcCidrCustomResource.VpcCidr
+
+      SecurityGroupEgress:
+        # Allow all outbound traffic
+        - IpProtocol: '-1'
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref DefaultCidr
+
       Tags:
         - Key: Name
-          Value: para-pam-SecurityGroup-trial
+          Value: !Join ['-', ['para-pam-SecurityGroup-free', !Ref 'AWS::Region']]
 
   PamElasticIP:
     Type: AWS::EC2::EIP
@@ -153,7 +167,7 @@ Resources:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: para-pam-EIP-trial
+          Value: !Join ['-',['para-pam-EIP-free', !Ref 'AWS::Region']]
 
   PamEC2Instance:
     Type: AWS::EC2::Instance
@@ -175,7 +189,7 @@ Resources:
           /opt/aws/bin/cfn-signal -e $? '${PamWaitHandle}' 
       Tags:
         - Key: Name
-          Value: para-pam-EC2Instance-trial
+          Value: !Join ['-', ['para-pam-EC2Instance-free', !Ref 'AWS::Region']]
 
   PamEIPAssociation:
     Type: AWS::EC2::EIPAssociation
@@ -197,4 +211,4 @@ Outputs:
   PamDeploymentMessage:
     Description: The final output of the Pam deployment
     Value: !Sub |
-      Access portal: https://${PamElasticIP} with credentail: _sysadmin/${PamSecurityGroup} You will have 7 days license for your evaluation and testing. Thanks!
+      Welcome to the Paraview PAM access portal: https://${PamElasticIP} with credentail: _sysadmin/${PamSecurityGroup} You will have 7 days license for your evaluation and testing. Thanks!
