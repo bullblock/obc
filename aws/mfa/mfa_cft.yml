@@ -85,7 +85,7 @@ Resources:
                 Resource: '*'
       Tags:
         - Key: Name
-          Value: !Join ['-', ['para-pam-IAMRole-free', !Ref 'AWS::Region']]
+          Value: !Join ['-', ['para-mfa-IAMRole-free', !Ref 'AWS::Region']]
 
   GetVpcCidrFunction:
     Type: AWS::Lambda::Function
