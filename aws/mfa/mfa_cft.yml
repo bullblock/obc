@@ -49,7 +49,6 @@ Parameters:
   DefaultCidr:
     Description: 'Please enter the 0.0.0.0/0 by default. Else you will not allow to access the portal.'
     Type: String
-    Default: '0.0.0.0/0'
     ConstraintDescription: 'Please enter the 0.0.0.0/0 by default. Else you will not allow to access the portal.'
 
 Resources:
