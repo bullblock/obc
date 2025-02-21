@@ -4,7 +4,7 @@ Description: Paraview PAM Standalone FREE edition for AWS Cloudformation Templat
 Mappings:
   RegionMap:
     us-east-1:
-      ami: ami-06f5003bcef1afcad
+      ami: ami-01c31ddbf79d6accc
     us-east-2:
       ami: ami-002a15b3f4771ef44
     us-west-1:
@@ -181,9 +181,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          private_ip=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
-          public_ip=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
-          /opt/script/config.sh $private_ip $public_ip ${PamSecurityGroup}
+          /opt/script/config.sh ${PamSecurityGroup}
           sleep 3m
           echo "***end of ansible playbook deployment for PAM***"
           /opt/aws/bin/cfn-signal -e $? '${PamWaitHandle}' 
