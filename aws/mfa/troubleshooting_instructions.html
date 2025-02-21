@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Paraview PAM Troubleshooting Guide</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2, h3 { color: #333; }
+        .solution { background-color: #e8f5e9; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .error { background-color: #ffebee; padding: 15px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Paraview PAM Troubleshooting Guide</h1>
+
+    <h2>Common Issues and Solutions</h2>
+
+    <h3>Prerequisites</h3>
+    <div class="error">
+        <strong>Prerequisites:</strong> Please make sure you are holding the SSH key pair.
+    </div>
+    <div class="SSH into the EC2 instance">
+        <strong>SSH into the EC2 instance:</strong>
+        <ul>
+            <li>user id: ec2-user</li>
+            <li>password: use the ssh-key pair not password</li>
+            <li>Public ip: get the public from aws console or from the AWS Clouformation Output</li>
+            <li>For example: ssh -i your_privated_key ec2-user@a.b.c.d </li>
+        </ul>
+    </div>
+
+    <h3>Troubleshooting Steps</h3>
+    <div class="error">
+        <strong>Instructions:</strong> Troubleshooting Steps
+    </div>
+    <div class="solution">
+        <strong>Solutions:</strong>
+        <ul>
+            <li>Open your Terminal. e.g. iTerm2</li>
+            <pre>
+            <code>
+#nc -zvt 18.138.199.0 22  #replace the public ip with yours.
+Connection to 18.138.199.0 port 22 [tcp/ssh] succeeded!
+#ssh -i your_privated_key ec2-user@18.138.199.0   #replase the privated key and ip.
+$sudo -i   #change into root user
+#tail -f /var/log/cloud-init-output.log #tail the cloud-init script output
+            </code>
+            </pre>
+            This is how to check the installation progress.
+        </ul>
+    </div>
+
+    <div class="error">
+        <strong>Instructions:</strong> How to resatrt the Application without reboot the EC2 instance. 
+    </div>
+    <div class="solution">
+        <strong>Solutions:</strong>
+        <ul>
+            <li>Open your Terminal. e.g. iTerm2</li>
+            <pre>
+                <code>
+    #ssh -i your_privated_key ec2-user@18.138.199.0   #replase the privated key and ip.
+    $sudo -i   #change into root user
+    #su - ecs  #change into esc user
+    $esc.sh all stop    #stop all components
+    $esc.sh all status  #show all components status
+    $esc.sh all start   #start all componnents
+                </code>
+                </pre>
+        Retsart the Application without reboot the EC2 instance.
+
+            <li>Or you may reboot the EC2 instance thru AWS console</li>
+        </ul>
+    </div>
+</body>
+</html>
