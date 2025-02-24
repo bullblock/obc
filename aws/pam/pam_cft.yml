@@ -173,6 +173,7 @@ Resources:
           sleep 3m
           echo "***end of ansible playbook deployment for PAM***"
           /opt/aws/bin/cfn-signal -e $? '${PamWaitHandle}' 
+          /usr/sbin/reboot
       Tags:
         - Key: Name
           Value: !Join ['-', ['para-pam-EC2Instance-free', !Ref 'AWS::Region']]
