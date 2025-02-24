@@ -35,10 +35,6 @@ Parameters:
       - m5.xlarge
       - m4.xlarge
 
-  ImageId:
-    Type: AWS::EC2::Image::Id
-    Default: ami-0f979511befd35252
-    
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the existing key pair
@@ -178,7 +174,7 @@ Resources:
     Properties:
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
-      ImageId: !Ref ImageId
+      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', ami]
       SubnetId: !Ref SubnetId
       SecurityGroupIds:
         - !Ref SecurityGroup
