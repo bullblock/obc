@@ -1,21 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Paraview PAM Standalone FREE edition for AWS Cloudformation Template ver 1.0
 
-Mappings:
-  RegionMap:
-    us-east-1:
-      ami: ami-043f85f6f71780863
-    us-east-2:
-      ami: ami-0891d1d4a9e8a7e91
-    us-west-1:
-      ami: ami-0db4eb9b421cbc929
-    us-west-2:
-      ami: ami-0d0a89a4cf0848910
-    ap-southeast-1:
-      ami: ami-00e56ae03c3c285e5
-    ap-east-1:
-      ami: ami-0d8e423cf84825275
-
 Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
@@ -34,6 +19,10 @@ Parameters:
       - t3.xlarge
       - m5.xlarge
       - m4.xlarge
+
+  ImageId:
+    Type: AWS::EC2::Image::Id
+    Default: ami-043f85f6f71780863
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
@@ -174,7 +163,7 @@ Resources:
     Properties:
       InstanceType: !Ref PamInstanceType
       KeyName: !Ref KeyName
-      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', ami]
+      ImageId: !Ref ImageId
       SubnetId: !Ref SubnetId
       SecurityGroupIds:
         - !Ref PamSecurityGroup
