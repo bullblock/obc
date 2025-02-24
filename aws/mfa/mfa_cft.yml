@@ -17,7 +17,7 @@ Parameters:
     AllowedValues:
       - t3.xlarge
       - m5.xlarge
-      - m4.xlarge
+      - m6i.xlarge
 
   ImageId:
     Type: AWS::EC2::Image::Id
