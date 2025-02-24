@@ -1,21 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Paraview MFA Standalone FREE edition for AWS Cloudformation Template ver 1.0
 
-Mappings:
-  RegionMap:
-    us-east-1:
-      ami: ami-0f979511befd35252
-    us-east-2:
-      ami: ami-09c68fb2e6a9f5824
-    us-west-1:
-      ami: ami-07021a9213a0a5567
-    us-west-2:
-      ami: ami-09541969338e4c074
-    ap-southeast-1:
-      ami: ami-07e497cbc2f94a11f
-    ap-east-1:
-      ami: ami-037bd7b631b99e986
-
 Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
@@ -30,7 +15,6 @@ Parameters:
     Default: m5.xlarge
     Description: Select the EC2 instance type
     AllowedValues:
-      - t2.xlarge
       - t3.xlarge
       - m5.xlarge
       - m4.xlarge
