@@ -1,20 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Paraview IAM Standalone FREE edition for AWS Cloudformation Template ver 1.0
-
-Mappings:
-  RegionMap:
-    us-east-1:
-      ami: ami-0641893be58217e66
-    us-east-2:
-      ami: ami-0b0499460c6c1d41e
-    us-west-1:
-      ami: ami-08af4028ce7378cc7
-    us-west-2:
-      ami: ami-0d4cd0609484556d7
-    ap-southeast-1:
-      ami: ami-0f888f6f98ea74f4f
-    ap-east-1:
-      ami: ami-06264d37e658dd958
+Description: Paraview PASG Standalone FREE edition for AWS Cloudformation Template ver 1.0
 
 Parameters:
   VpcId:
@@ -27,24 +12,27 @@ Parameters:
 
   InstanceType:
     Type: String
-    Default: m5.xlarge
+    Default: m5.2xlarge
     Description: Select the EC2 instance type
     AllowedValues:
-      - t2.xlarge
-      - t3.xlarge
-      - m5.xlarge
-      - m4.xlarge
+      - t3.2xlarge
+      - m5.2xlarge
+      - m6i.2xlarge
+  
+  ImageId:
+    Type: AWS::EC2::Image::Id
+    Default: ami-068d93cb5fd017297
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the existing key pair
     ConstraintDescription: Select the existing key pair
 
-  SshCidr:
-    Description: 'Please enter the CIDR block for SSH access (e.g., 0.0.0.0/0 or 192.168.0.0/16)'
+  AccessCidr:
+    Description: 'Please enter the 0.0.0.0/0 by default. Else you will not allow to access the portal.'
     Type: String
     AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
-    ConstraintDescription: 'Must be a valid CIDR block in the format x.x.x.x/n'
+    ConstraintDescription: 'Please enter the 0.0.0.0/0 here. Else you will not allow to access the portal.'
 
 Resources:
   WaitHandle:
@@ -60,7 +48,7 @@ Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Join ['-', ['para-iam-IAMRole-free', !Ref 'AWS::Region']]
+      RoleName: !Join ['-', ['para-pasg-IAMRole-free', !Ref 'AWS::Region']]
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -69,7 +57,7 @@ Resources:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: !Join ['-', ['para-iam-IAMPolicy-free', !Ref 'AWS::Region']]
+        - PolicyName: !Join ['-', ['para-pasg-IAMPolicy-free', !Ref 'AWS::Region']]
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -79,12 +67,12 @@ Resources:
                 Resource: '*'
       Tags:
         - Key: Name
-          Value: !Join ['-',['para-iam-IAMRole-free', !Ref 'AWS::Region']]
+          Value: !Join ['-',['para-pasg-IAMRole-free', !Ref 'AWS::Region']]
 
   GetVpcCidrFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Join ['-',['para-iam-LambdaFunction-free', !Ref 'AWS::Region']]
+      FunctionName: !Join ['-',['para-pasg-LambdaFunction-free', !Ref 'AWS::Region']]
       Handler: index.handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.12
@@ -105,7 +93,7 @@ Resources:
       Timeout: 60
       Tags:
         - Key: Name
-          Value: !Join ['-',['para-iam-LambdaFunction-free', !Ref 'AWS::Region']]
+          Value: !Join ['-',['para-pasg-LambdaFunction-free', !Ref 'AWS::Region']]
 
   VpcCidrCustomResource:
     Type: Custom::GetVpcCidr
@@ -116,7 +104,7 @@ Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Join ['-', ['para-iam-SecurityGroup-free', !Ref 'AWS::Region']]
+      GroupName: !Join ['-', ['para-pasg-SecurityGroup-free', !Ref 'AWS::Region']]
       GroupDescription: Security group with specific ingress rules
       VpcId: !Ref VpcId
       SecurityGroupIngress:
@@ -124,28 +112,36 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: !Ref SshCidr
+          CidrIp: !Ref AccessCidr
 
         # Allow HTTPS (port 443) from anywhere
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref AccessCidr
 
         # Allow HTTP (port 80) from anywhere
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref AccessCidr
 
         # Allow all traffic within the VPC CIDR range
         - IpProtocol: -1
           FromPort: -1
           ToPort: -1
           CidrIp: !GetAtt VpcCidrCustomResource.VpcCidr
+
+      SecurityGroupEgress:
+        # Allow all outbound traffic
+        - IpProtocol: '-1'
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref AccessCidr
+
       Tags:
         - Key: Name
-          Value: !Join ['-', ['para-iam-SecurityGroup-free', !Ref 'AWS::Region']]
+          Value: !Join ['-', ['para-pasg-SecurityGroup-free', !Ref 'AWS::Region']]
 
   ElasticIP:
     Type: AWS::EC2::EIP
@@ -153,27 +149,27 @@ Resources:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: !Join ['-', ['para-iam-EIP-free', !Ref 'AWS::Region']]
+          Value: !Join ['-', ['para-pasg-EIP-free', !Ref 'AWS::Region']]
 
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
-      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', ami]
+      ImageId: !Ref ImageId
       SubnetId: !Ref SubnetId
       SecurityGroupIds:
         - !Ref SecurityGroup
       UserData: 
         Fn::Base64: !Sub |
           #!/bin/bash
-          /bin/bash /opt/script/iam_config.sh ${SecurityGroup}
-          sleep 3m
+          /bin/bash /opt/script/config.sh ${SecurityGroup}
+          sleep 1m
           echo "***end of ansible playbook deployment***"
           /opt/aws/bin/cfn-signal -e $? '${WaitHandle}' 
       Tags:
         - Key: Name
-          Value: !Join ['-', ['para-iam-EC2Instance-free', !Ref 'AWS::Region']]
+          Value: !Join ['-', ['para-pasg-EC2Instance-free', !Ref 'AWS::Region']]
 
   EIPAssociation:
     Type: AWS::EC2::EIPAssociation
@@ -193,4 +189,4 @@ Outputs:
   DeploymentMessage:
     Description: The final output of the deployment
     Value: !Sub |
-      Welcome to Paraview IAM access portal: http://${ElasticIP} with credentail: sysadmin/${SecurityGroup} You will have 7 days license for your evaluation and testing. Thanks!
+      Welcome to Paraview PASG access portal: http://${ElasticIP} with credentail: sysadmin/${SecurityGroup} You will have 7 days license for your evaluation and testing. Thanks!
