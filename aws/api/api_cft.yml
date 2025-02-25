@@ -197,4 +197,4 @@ Outputs:
   DeploymentMessage:
     Description: The final output of the API deployment
     Value: !Sub |
-      Welcome to the Paraview API Gateway Solution access portal: https://${ElasticIP} with credentail: _sysadmin/${SecurityGroup} You will have 7 days license for your evaluation and testing. Thanks!
+      Welcome to the Paraview API Platform access portal: https://${ElasticIP} with credentail: admin/${SecurityGroup} You will have 7 days license for your evaluation and testing. Thanks!
