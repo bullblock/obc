@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Paraview PAM Standalone FREE edition for AWS Cloudformation Template ver 1.0
+Description: Paraview API Standalone FREE edition for AWS Cloudformation Template ver 1.0
 
 Parameters:
   VpcId:
@@ -10,18 +10,18 @@ Parameters:
     Type: AWS::EC2::Subnet::Id
     Description: Select a public subnet within the chosen VPC
 
-  PamInstanceType:
+  InstanceType:
     Type: String
-    Default: m5.xlarge
-    Description: Select the EC2 instance type for PAM instance
+    Default: m5.2xlarge
+    Description: Select the EC2 instance type for API instance
     AllowedValues:
-      - t3.xlarge
-      - m5.xlarge
-      - m6i.xlarge
+      - t3.2xlarge
+      - m5.2xlarge
+      - m6i.2xlarge
 
   ImageId:
     Type: AWS::EC2::Image::Id
-    Default: ami-043f85f6f71780863
+    Default: ami-02bbfb9563be9a82a
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
@@ -35,20 +35,20 @@ Parameters:
     ConstraintDescription: 'Please enter the 0.0.0.0/0 by default. Else you will not allow to access the portal.'
 
 Resources:
-  PamWaitHandle:
+  WaitHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
 
-  PamWaitCondition:
+  WaitCondition:
     Type: AWS::CloudFormation::WaitCondition
     Properties:
-      Handle: !Ref PamWaitHandle
+      Handle: !Ref WaitHandle
       Timeout: '2700'
       Count: 1
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Join ['-', ['para-pam-IAMRole-free', !Ref 'AWS::Region']]
+      RoleName: !Join ['-', ['para-api-IAMRole-free', !Ref 'AWS::Region']]
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -57,7 +57,7 @@ Resources:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: !Join ['-', ['para-pam-IAMPolicy-free', !Ref 'AWS::Region']]
+        - PolicyName: !Join ['-', ['para-api-IAMPolicy-free', !Ref 'AWS::Region']]
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -67,12 +67,12 @@ Resources:
                 Resource: '*'
       Tags:
         - Key: Name
-          Value: !Join ['-', ['para-pam-IAMRole-free', !Ref 'AWS::Region']]
+          Value: !Join ['-', ['para-api-IAMRole-free', !Ref 'AWS::Region']]
 
   GetVpcCidrFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Join ['-', ['para-pam-LambdaFunction-free', !Ref 'AWS::Region']]
+      FunctionName: !Join ['-', ['para-api-LambdaFunction-free', !Ref 'AWS::Region']]
       Handler: index.handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.12
@@ -93,7 +93,7 @@ Resources:
       Timeout: 60
       Tags:
         - Key: Name
-          Value: !Join ['-', ['para-pam-LambdaFunction-free', !Ref 'AWS::Region']]
+          Value: !Join ['-', ['para-api-LambdaFunction-free', !Ref 'AWS::Region']]
 
   VpcCidrCustomResource:
     Type: Custom::GetVpcCidr
@@ -101,11 +101,11 @@ Resources:
       ServiceToken: !GetAtt GetVpcCidrFunction.Arn
       VpcId: !Ref VpcId
 
-  PamSecurityGroup:
+  SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Join ['-', ['para-pam-SecurityGroup-free', !Ref 'AWS::Region']]
-      GroupDescription: Pam EC2 Security group with specific ingress rules
+      GroupName: !Join ['-', ['para-api-SecurityGroup-free', !Ref 'AWS::Region']]
+      GroupDescription: API EC2 Security group with specific ingress rules
       VpcId: !Ref VpcId
       SecurityGroupIngress:
         # Allow SSH (port 22) from anywhere
@@ -141,55 +141,55 @@ Resources:
 
       Tags:
         - Key: Name
-          Value: !Join ['-', ['para-pam-SecurityGroup-free', !Ref 'AWS::Region']]
+          Value: !Join ['-', ['para-api-SecurityGroup-free', !Ref 'AWS::Region']]
 
-  PamElasticIP:
+  ElasticIP:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: !Join ['-',['para-pam-EIP-free', !Ref 'AWS::Region']]
+          Value: !Join ['-',['para-api-EIP-free', !Ref 'AWS::Region']]
 
-  PamEC2Instance:
+  EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: !Ref PamInstanceType
+      InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
       ImageId: !Ref ImageId
       SubnetId: !Ref SubnetId
       SecurityGroupIds:
-        - !Ref PamSecurityGroup
+        - !Ref SecurityGroup
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /opt/script/config.sh ${PamSecurityGroup}
+          /opt/script/config.sh ${SecurityGroup}
           sleep 3m
-          echo "***end of ansible playbook deployment for PAM***"
-          /opt/aws/bin/cfn-signal -e $? '${PamWaitHandle}' 
+          echo "***end of ansible playbook deployment for API***"
+          /opt/aws/bin/cfn-signal -e $? '${WaitHandle}' 
           /usr/sbin/reboot
       Tags:
         - Key: Name
-          Value: !Join ['-', ['para-pam-EC2Instance-free', !Ref 'AWS::Region']]
+          Value: !Join ['-', ['para-api-EC2Instance-free', !Ref 'AWS::Region']]
 
-  PamEIPAssociation:
+  EIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      AllocationId: !GetAtt PamElasticIP.AllocationId
-      InstanceId: !Ref PamEC2Instance
+      AllocationId: !GetAtt ElasticIP.AllocationId
+      InstanceId: !Ref EC2Instance
 
 Outputs:
-  PamInstanceId:
-    Description: ID of the PAM EC2 instance
-    Value: !Ref PamEC2Instance
+  InstanceId:
+    Description: ID of the API EC2 instance
+    Value: !Ref EC2Instance
   
 
-  PamPublicIP:
-    Description: Public IP address of the PAM EC2 instance
-    Value: !Ref PamElasticIP
+  PublicIP:
+    Description: Public IP address of the API EC2 instance
+    Value: !Ref ElasticIP
 
 
-  PamDeploymentMessage:
-    Description: The final output of the Pam deployment
+  DeploymentMessage:
+    Description: The final output of the API deployment
     Value: !Sub |
-      Welcome to the Paraview PAM access portal: https://${PamElasticIP} with credentail: _sysadmin/${PamSecurityGroup} You will have 7 days license for your evaluation and testing. Thanks!
+      Welcome to the Paraview API Gateway Solution access portal: https://${ElasticIP} with credentail: _sysadmin/${SecurityGroup} You will have 7 days license for your evaluation and testing. Thanks!
