@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Paraview Application Service Gateway Installation Guide for AWS</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 1600px; margin: 0 auto; padding: 20px; }
+        h1, h2, h3 { color: #333; }
+        .note { background-color: #f0f0f0; padding: 15px; border-radius: 5px; }
+        .warning { background-color: #fff3cd; padding: 15px; border-radius: 5px; }
+        code { background-color: #f8f9fa; padding: 2px 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Paraview Application Service Gateway Installation Guide for AWS</h1>
+    
+    <h2>Prerequisites</h2>
+    <ul>
+        <li>AWS account with administrative privileges</li>
+        <li>Default VPC or a VPC with a Public Subnet (able to auto assign public IP)</li>
+        <li>Pre-defined SSH key pair</li>
+        <li>Neccesary region access and resources (e.g. EC2, Lambda)</li>
+    </ul>
+
+    <h2>Step 1: Infrastructure Check</h2>
+    <ol>
+        <li>Launch AWS console and make sure in your region, there is at least one Default VPC or user defined VPC with IGW and Public subnet created with Auto Assign IP enabled</li>
+        <li>Check your EC2 manual, under Key Pair. Make sure there is at least one user-defined SSH key Pair is ready. Make sure you are holding the privated key. You will be request it while SSH into the EC2 instance</li>
+    </ol>
+
+    <h2>Step 2: Installation thru AWS Marketplace</h2>
+    <ol>
+        <li>Please open your Browser, we recommend Chrome and go to <a href="https://aws.amazon.com/marketplace">AWS Marketplace</a></li>
+        <li>Search <b>Paraview Software</b>, you will see there are few software. Please click <b>Paraview Application Service Gateway</b> and continue</li>
+        <li>Pickup your installation region and click subscription and agree the agreement</li>
+        <li>Key in a Stack Name: e.g. Paraview PASG Evaluation</li>
+        <li>Pickup your EC2 instance type. we recommand m5.2xlarge. In some regions some types may or may not available. please pickup the right one.</li>
+        <li>Pickup your SSH key pair name</li>
+        <li>Key in your AccessCidr. This is a CIDR which allow you access the service, please make sure the AccessCidr will be 0.0.0.0/0, or you will not allow to access the services.</li>
+        <li>pickup your subnet</li>
+        <li>pickup your vpc</li>
+        <li>Click Next</li>
+        <li>Check the "<b>I acknowledge that AWS CloudFormation might create IAM resources with custom names.</b>" option. And click Next</li>
+        <li>Click Submit. That is all</li>
+        <li>This installation will trigger a Cloudformation Stack creation, and an IAM Role and Policy creation, which will helping to create a Lambda function for get the exsiting VPC CIDR.</li>
+        <li>Please be patient. The installation process will be around 5 mins</li>
+        <li>Please check the <b>Output</b> column for your application credentials.</li>
+    </ol>
+
+    <div class="note">
+        <strong>Note:</strong> Please be patient. The installation process will be around 5 mins. Please check the <b>Output</b> for your application default crendential. 
+    </div>
+</body>
+</html>
