@@ -21,7 +21,7 @@ Parameters:
 
   ImageId:
     Type: AWS::EC2::Image::Id
-    Default: ami-02bbfb9563be9a82a
+    Default: ami-0ff94f5c2a85a2e7f
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
@@ -163,11 +163,13 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /opt/script/config.sh ${SecurityGroup}
+          token=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+          private_ip=$(curl -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/local-ipv4)
+          public_ip=$(curl -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/public-ipv4)
+          /opt/script/config.sh $private_ip $public_ip ${SecurityGroup}
           sleep 3m
           echo "***end of ansible playbook deployment for API***"
-          /opt/aws/bin/cfn-signal -e $? '${WaitHandle}' 
-          /usr/sbin/reboot
+          /opt/aws/bin/cfn-signal -e $? '${WaitHandle}'
       Tags:
         - Key: Name
           Value: !Join ['-', ['para-api-EC2Instance-free', !Ref 'AWS::Region']]
