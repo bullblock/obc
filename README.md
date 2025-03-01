@@ -1,2 +1,2 @@
 # obc
-Paraview Onboarding Cloud
+Paraview Onboarding Cloud project
