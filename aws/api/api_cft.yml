@@ -21,7 +21,7 @@ Parameters:
 
   ImageId:
     Type: AWS::EC2::Image::Id
-    Default: ami-02061862eabfbcd65
+    Default: ami-050871746fb0590f9
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
@@ -162,17 +162,20 @@ Resources:
         - !Ref SecurityGroup
       UserData:
         Fn::Base64: !Sub |
-          #!/bin/bash
-          sleep 1m
-          token=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
-          private_ip=$(curl -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/local-ipv4)
-          public_ip=$(curl -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/public-ipv4)
-          echo "$private_ip $public_ip ${SecurityGroup}"
-          /opt/script/config.sh $private_ip $public_ip ${SecurityGroup}
-          rm -rf /opt/script/config.sh
-          sleep 2m
-          echo "***end of ansible playbook deployment for API***"
-          /opt/aws/bin/cfn-signal -e $? '${WaitHandle}'
+          #cloud-config
+          runcmd:
+            - |
+              #!/bin/bash
+              sleep 1m
+              token=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+              private_ip=$(curl -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/local-ipv4)
+              public_ip=$(curl -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/public-ipv4)
+              echo "$private_ip $public_ip ${SecurityGroup}"
+              /opt/script/config.sh "$private_ip" "$public_ip" "${SecurityGroup}"
+              rm -rf /opt/script/config.sh
+              sleep 2m
+              echo "***end of ansible playbook deployment for API***"
+              /opt/aws/bin/cfn-signal -e $? '${WaitHandle}'
       Tags:
         - Key: Name
           Value: !Join ['-', ['para-api-EC2Instance-free', !Ref 'AWS::Region']]
