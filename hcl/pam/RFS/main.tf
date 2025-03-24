@@ -86,7 +86,7 @@ module "ecs" {
   public_ip=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
   echo 'root:${var.admin_password}' | chpasswd
   /opt/scripts/config.sh $private_ip $public_ip
-  sleep 3m
+  sleep 1m
   echo "***end of ansible playbook deployment***"
   EOF
 }

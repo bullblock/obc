@@ -44,7 +44,8 @@ locals {
   #镜像版本：Centos 8.2  标准版64位
   # cn-north-4 北京4;  cn-southwest-2 贵阳1; south-1 广州,cn-east-3 ; cn-east3 上海一；cn-north-9 乌兰察布,ap-southeast-3 新加坡
   instance_image_id_maps = {
-    ap-southeast-3 = "219e1aec-dd6f-44f7-9d20-c2705d96acc9"
+  # ap-southeast-3 = "4a0e5529-986b-4040-8951-817f456f7139"
+    ap-southeast-3 = "ab1c041b-1565-4df6-9736-3a7e541d3c44"
     cn-north-4     = "638a15ac-bc2b-4f87-a896-047a271caf65"
     cn-south-1     = "b5331dc9-9a18-4dcc-98c4-0c6d335aa548"
     cn-east-3      = "6674d782-54ba-4f04-896d-95edd50f2eb9"
