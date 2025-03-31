@@ -84,7 +84,7 @@ module "ecs" {
   #!/bin/bash
   private_ip=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
   public_ip=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
-  password="Admin!123&paraview"
+  password="Parav1ew!"
   echo 'root:${var.admin_password}' | chpasswd
   /opt/scripts/config.sh $private_ip $public_ip $password
   sleep 3m
