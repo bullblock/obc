@@ -45,7 +45,7 @@ locals {
   # cn-north-4 北京4;  cn-southwest-2 贵阳1; south-1 广州,cn-east-3 ; cn-east3 上海一；cn-north-9 乌兰察布,ap-southeast-3 新加坡
   instance_image_id_maps = {
   # ap-southeast-3 = "4a0e5529-986b-4040-8951-817f456f7139"
-    ap-southeast-3 = "6cff83f9-3525-4622-a665-e5649d59f698"
+    ap-southeast-3 = "0103823e-c2f3-4a70-aac0-302d1c4ebc34"
     cn-north-4     = "638a15ac-bc2b-4f87-a896-047a271caf65"
     cn-south-1     = "b5331dc9-9a18-4dcc-98c4-0c6d335aa548"
     cn-east-3      = "6674d782-54ba-4f04-896d-95edd50f2eb9"
